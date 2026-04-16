@@ -1,43 +1,43 @@
 # HydroSense
 
-Sistema IoT de monitoreo de humedad del suelo y riego automatico de plantas, basado en ESP32 con integracion a la nube y dashboard en tiempo real.
+Sistema IoT de monitoreo de humedad del suelo y riego automático de plantas, basado en ESP32 con integracion a la nube y dashboard en tiempo real.
 
 ---
 
 ## Tabla de contenido
 
-- [Vision del proyecto](#vision-del-proyecto)
+- [Visión del proyecto](#vision-del-proyecto)
 - [Arquitectura del sistema](#arquitectura-del-sistema)
-- [Componentes tecnicos](#componentes-tecnicos)
+- [Componentes técnicos](#componentes-tecnicos)
 - [Restricciones del sistema](#restricciones-del-sistema)
 - [Reporte del spike](#reporte-del-spike)
-- [Instrucciones de instalacion](#instrucciones-de-instalacion)
+- [Instrucciones de instalación](#instrucciones-de-instalacion)
 - [Equipo](#equipo)
 
 ---
 
-## Vision del proyecto
+## Visión del proyecto
 
 ### Problema que resuelve
 
 El riego manual de plantas es inconsistente e ineficiente. Las principales consecuencias son:
 
 - Muerte de plantas por falta de riego o por exceso de agua.
-- Ausencia de retroalimentacion objetiva sobre el estado real del suelo.
-- Ineficiencia en el uso del agua en entornos domesticos y cultivos urbanos.
+- Ausencia de retroalimentación objetiva sobre el estado real del suelo.
+- Ineficiencia en el uso del agua en entornos domésticos y cultivos urbanos.
 
 ### Solucion
 
-HydroSense es un sistema embebido que mide continuamente la humedad del suelo a traves de sensores conectados a un microcontrolador ESP32. Cuando la humedad cae por debajo de un umbral configurado, el sistema actua de dos maneras: Envia una notificacion push al usuario o activa una bomba de agua de forma automatica. Los datos se publican en la nube y son visibles desde un dashboard web en tiempo real.
+HydroSense es un sistema embebido que mide continuamente la humedad del suelo a través de sensores conectados a un microcontrolador ESP32. Cuando la humedad cae por debajo de un umbral configurado, el sistema actua de dos maneras: Envia una notificación push al usuario o activa una bomba de agua de forma automática. Los datos se publican en la nube y son visibles desde un dashboard web en tiempo real.
 
 ### Usuarios objetivo
 
-| Segmento | Descripcion |
+| Segmento | Descripción |
 |----------|-------------|
 | Hogares con plantas | Personas con plantas en interiores o balcones |
-| Hogares inteligentes | Usuarios con ecosistemas domoticos |
-| Pequenos agricultores | Cultivos urbanos, huertas caseras |
-| Educacion STEM | Proyectos academicos de IoT y sistemas embebidos |
+| Hogares inteligentes | Usuarios con ecosistemas domóticos |
+| Pequeños agricultores | Cultivos urbanos, huertas caseras |
+| Educacion STEM | Proyectos académicos de IoT y sistemas embebidos |
 
 ---
 
@@ -49,7 +49,7 @@ HydroSense es un sistema embebido que mide continuamente la humedad del suelo a 
 
 El sistema esta organizado en tres capas:
 
-**Hardware layer:** Dos sensores de humedad del suelo conectados al ADC1 del ESP32. El ESP32 lee las senales, aplica la logica de decision y controla un rele que activa o desactiva la bomba de agua.
+**Hardware layer:** Dos sensores de humedad del suelo conectados al ADC1 del ESP32. El ESP32 lee las senales, aplica la lógica de decision y controla un rele que activa o desactiva la bomba de agua.
 
 **Cloud layer:** El ESP32 publica los datos via MQTT a un broker en la nube (HiveMQ Cloud). Los datos se almacenan en Firebase Realtime Database. Firebase Cloud Functions se encarga de enviar notificaciones push al usuario cuando se detecta un nivel critico de humedad.
 
@@ -95,7 +95,7 @@ hydrosense/
 
 ---
 
-## Componentes tecnicos
+## Componentes técnicos
 
 ### Hardware
 
@@ -112,7 +112,7 @@ hydrosense/
 
 ### Software y plataformas
 
-| Capa | Tecnologia | Justificacion |
+| Capa | Tecnología | Justificación |
 |------|-----------|---------------|
 | Firmware | C++ / Arduino Framework | Compatibilidad con ESP32, documentacion amplia |
 | Comunicacion | MQTT (PubSubClient) | Protocolo ligero, disenado para IoT |
@@ -127,18 +127,18 @@ hydrosense/
 
 ### Restricciones tecnicas
 
-| Restriccion | Detalle | Mitigacion |
+| Restricción | Detalle | Mitigacion |
 |------------|---------|------------|
 | Memoria del ESP32 | 520 KB RAM; WiFi + MQTT usan ~60 KB | Minimizar buffers; usar QoS 0 para lecturas periodicas |
 | ADC2 incompatible con WiFi | Los pines ADC2 del ESP32 no pueden usarse mientras WiFi esta activo | Usar exclusivamente pines ADC1: GPIO32–GPIO39 |
 | No linealidad del ADC | El ADC del ESP32 es no lineal cerca de 0 V y 3.3 V | Calibrar con valores de referencia; usar `esp_adc_cal` |
 | Consumo energetico | ~240 mA en transmision WiFi activa | Modo deep sleep entre ciclos de lectura (cada 5 min) |
-| Latencia de red | WiFi domestico: 20–200 ms | No es critico; el riego no requiere tiempo real estricto |
+| Latencia de red | WiFi domestico: 20–200 ms | No es crítico; el riego no requiere tiempo real estricto |
 | Durabilidad del sensor | Los sensores resistivos (YL-69) se oxidan con el tiempo | Preferir sensores capacitivos en la version final |
 
 ### Restricciones del proyecto
 
-- Presupuesto maximo de hardware para el prototipo: **$100.000 COP**
+- Presupuesto máximo de hardware para el prototipo: **$100.000 COP**
 - Tiempo de desarrollo: **8 semanas** (proyecto)
 - Infraestructura: servicios gratuitos unicamente (Firebase free tier, HiveMQ free tier)
 
@@ -146,40 +146,40 @@ hydrosense/
 
 ## Reporte del spike
 
-El spike tecnico corresponde a la tarea [SPIKE-01] del Release 1. El objetivo fue validar dos incertidumbres tecnicas criticas antes de iniciar el desarrollo del sistema completo.
+El spike técnico corresponde a la tarea [SPIKE-01] del Release 1. El objetivo fue validar dos incertidumbres técnicas críticas antes de iniciar el desarrollo del sistema completo.
 
 ### Spike 1: Estabilidad de lectura de los sensores de humedad
 
 **Pregunta:** El ADC1 del ESP32 entrega lecturas con varianza suficientemente baja para diferenciar de forma confiable los estados SECO, NORMAL y SATURADO?
 
-**Experimento:** Se tomaron 50 muestras del sensor YL-69 conectado al GPIO34 en tres condiciones distintas del suelo: Seco (sin regar 48 h), humedo (regado 1 h antes) y saturado (agua visible en superficie). Se calculo la media y la desviacion estandar para cada condicion.
+**Experimento:** Se tomaron 50 muestras del sensor YL-69 conectado al GPIO34 en tres condiciones distintas del suelo: Seco (sin regar 48 h), humedo (regado 1 h antes) y saturado (agua visible en superficie). Se calculó la media y la desviación estándar para cada condicion.
 
-| Condicion | Valor ADC promedio | Desv. estandar | Humedad (%) |
+| Condición | Valor ADC promedio | Desv. estándar | Humedad (%) |
 |-----------|--------------------|----------------|-------------|
 | Seco | ~3.300 | ±48 | 0–18 % |
 | Humedo | ~2.000 | ±32 | 38–60 % |
 | Saturado | ~950 | ±24 | 80–100 % |
 
-**Conclusion:** Viable. Promediar 20 muestras con 10 ms de separacion reduce el ruido a niveles aceptables. Los tres estados son distinguibles con un margen amplio. Se definieron los umbrales operativos: SECO si humedad < 30 %, SATURADO si humedad > 75 %. Se recomienda migrar a sensor capacitivo en la version final para mayor durabilidad.
+**Conclusión:** Viable. Promediar 20 muestras con 10 ms de separación reduce el ruido a niveles aceptables. Los tres estados son distinguibles con un margen amplio. Se definieron los umbrales operativos: SECO si humedad < 30 %, SATURADO si humedad > 75 %. Se recomienda migrar a sensor capacitivo en la version final para mayor durabilidad.
 
 ### Spike 2: Conectividad ESP32 a Firebase via MQTT
 
-**Pregunta:** El ESP32 puede publicar datos a Firebase de forma confiable (> 95 % de mensajes entregados) con latencia aceptable en una red domestica?
+**Pregunta:** El ESP32 puede publicar datos a Firebase de forma confiable (> 95 % de mensajes entregados) con latencia aceptable en una red doméstica?
 
-**Experimento:** Se publicaron 100 mensajes cada 5 segundos durante 10 minutos usando la libreria PubSubClient hacia un broker HiveMQ Cloud (free tier). Se midio la tasa de entrega, la latencia promedio y el consumo de RAM adicional.
+**Experimento:** Se publicaron 100 mensajes cada 5 segundos durante 10 minutos usando la librería PubSubClient hacia un broker HiveMQ Cloud (free tier). Se midió la tasa de entrega, la latencia promedio y el consumo de RAM adicional.
 
-| Metrica | Resultado |
+| Métrica | Resultado |
 |---------|-----------|
 | Tasa de entrega | 98.5 % (2 timeouts por reconexion) |
 | Latencia promedio | ~180 ms |
 | RAM adicional usada | ~45 KB |
-| Tiempo de reconexion | < 8 s |
+| Tiempo de reconexión | < 8 s |
 
-**Conclusion:** Viable. La tasa de entrega supera el umbral objetivo. La latencia es aceptable para el caso de uso. Se implementara reconexion automatica con backoff exponencial para manejar los casos de perdida temporal de conexion.
+**Conclusión:** Viable. La tasa de entrega supera el umbral objetivo. La latencia es aceptable para el caso de uso. Se implementara reconexión automática con backoff exponencial para manejar los casos de pérdida temporal de conexión.
 
 ---
 
-## Instrucciones de instalacion
+## Instrucciones de instalación
 
 ### Requisitos previos
 
